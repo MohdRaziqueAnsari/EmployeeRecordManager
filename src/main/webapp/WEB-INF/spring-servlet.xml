@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        classpath:org/springframework/beans/factory/xml/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        classpath:org/springframework/context/config/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        classpath:org/springframework/web/servlet/config/spring-mvc.xsd
+        http://www.springframework.org/schema/tx
+        classpath:org/springframework/transaction/config/spring-tx.xsd">
+
+    <!-- ===========================
+         1️⃣ Enable Spring MVC Annotations
+         =========================== -->
+    <mvc:annotation-driven/>
+
+    <!-- ===========================
+         2️⃣ Component Scan for Controllers, Services, DAO
+         =========================== -->
+    <context:component-scan base-package="com.employee"/>
+
+    <!-- ===========================
+         3️⃣ JSP View Resolver
+         =========================== -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/pages/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!-- ===========================
+         4️⃣ DataSource (MySQL)
+         =========================== -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/employeedb?useSSL=false&amp;serverTimezone=UTC"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+    </bean>
+
+    <!-- ===========================
+         5️⃣ Hibernate SessionFactory
+         =========================== -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="packagesToScan" value="com.employee.model"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- ===========================
+         6️⃣ Hibernate Transaction Manager
+         =========================== -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!-- ===========================
+         7️⃣ Enable @Transactional
+         =========================== -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+</beans>
